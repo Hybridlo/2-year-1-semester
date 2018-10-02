@@ -1,7 +1,14 @@
 #include <iostream>
-#include <vertor>
+#include <vector>
 #include <string>
 #include <queue>
+
+using namespace std;
+
+template <typename T>
+class Node;
+
+class Book;
 
 class Character
 {
@@ -9,8 +16,9 @@ private:
     string name;
     vector<int> importance;
     vector<Book*> inBook;
+    Node<Book> *father;
 public:
-    void newBook(string charBuffer, Book *from)
+    void newBook(string charBuffer, Book *from, Node<Book> *fath)
     {
         name = charBuffer;
         addBook(from);
@@ -19,7 +27,7 @@ public:
     {
         cout << "¬ведите важность персонажа (0 - главный, 1 = второстепенный, 2 - эпизодический): ";
         int  imp;
-        cin << imp;
+        cin >> imp;
         importance.push_back(imp);
         inBook.push_back(from);
     }
@@ -27,9 +35,11 @@ public:
     {
         return name;
     }
+    Node<Book> *getFather()
+    {
+        return father;
+    }
 };
-
-class Node;
 
 class Book
 {
@@ -43,37 +53,35 @@ private:
     string annotation;
     string charName;
     vector<Character*> characters;
-    queue<string> allChars;
-    Node *tiedTo;
+    queue<Character*> allChars;
+    Node<Book> *tiedTo;
 public:
-    void addChar(string charName)
+    void *addChar(string charName)
     {
         Character *queueBuffer;
-        bool inAnotherBook = false;
 
-        for (int i = allChars.size(), i--, i>0)
+        for (int i = allChars.size(); i>0; i--)
         {
             queueBuffer = allChars.front();
             allChars.pop();
-            string charBuffer = queueBuffer->getname();
+            string charBuffer = queueBuffer->getName();
+            allChars.push(queueBuffer);
 
             if (charName == charBuffer)
             {
-                inAnotherBook = true;
                 queueBuffer->addBook(this);
+                tiedTo = queueBuffer->getFather();
                 characters.push_back(queueBuffer);
+                return 0;
             }
 
         }
 
-        if (!inAnotherBook)
-        {
-            Character *newChar = new Character;
-            newChar->newBook(charName, this);
-            characters.push_back(queueBuffer);
-        }
+        Character *newChar = new Character;
+        newChar->newBook(charName, this, tiedTo);
+        characters.push_back(queueBuffer);
     }
-    bool addBook(Node *connection)
+    Node<Book> *addBook(Node<Book> *connection)
     {
         tiedTo = connection;
         cout << "¬ведите название книги: ";
@@ -98,6 +106,8 @@ public:
             addChar(charName);
             cin >> charName;
         }
+
+        return tiedTo;
     }
     int getYear()
     {
@@ -137,9 +147,8 @@ public:
             return true;
         else
 
-        if (day => comDay)
+        if (day >= comDay)
             return false;
-        else
     }
 };
 
@@ -148,31 +157,25 @@ class Node
 {
 private:
     vector<T> content;
-    static allNodes = 0;
     int thisNode;
+public:
+    static int allNodes;
     static vector<int> edgeList[2];
     static vector<bool> isVisited;
-public:
     Node()
     {
         thisNode = allNodes;
-        allNodes++;
     }
     void filling(T filled)
     {
         content.push_back(filled);
     }
-    void connection(int connectingTo)
-    {
-        edgeList[0].push_back(thisNode);
-        edgeList[1].push_back(connectingTo);
-    }
     void sortSeries()
     {
         T buffer;
 
-        for (int i = 0, i < content.size(), i++)
-            for (int j = i, j < content.size(), j++)
+        for (int i = 0; i < content.size(); i++)
+            for (int j = i; j < content.size(); j++)
 
                 if (content[i] < content[j])
                 {
@@ -181,26 +184,32 @@ public:
                     content[j] = buffer;
                 }
     }
-    static void spanningTree(int *pos)
+    static void dfs(int pos)
     {
-        for (int i = 0; i < allNodes, i++)
-            isVisited.push_back(false);
-
-        dfs(int *pos);
-
-        isVisited.clear();
-    }
-    static void dfs(int *pos)
-    {
-        for (int i = 0; i < edgeList[0].size(), i++)
+        for (int i = 0; i < edgeList[0].size(); i++)
         {
 
-            if (*pos = edgeList[0][i] && !isVisited[edgelist[1][i]])
+            if (pos == edgeList[0][i] && !isVisited[edgeList[1][i]])
             {
                 cout << edgeList[0][i] << "-" << edgeList[1][i];
                 isVisited[edgeList[0][i]] = true;
-                dfs(*edgeList[1][i]);
+                dfs(edgeList[1][i]);
             }
         }
     }
+    static void spanningTree(int pos)
+    {
+        for (int i = 0; i < allNodes; i++)
+            isVisited.push_back(false);
+
+        Node::dfs(pos);
+
+        isVisited.clear();
+    }
 };
+template <typename T>
+int Node<T>::allNodes;
+template <typename T>
+vector<int> Node<T>::edgeList[2];
+template <typename T>
+vector<bool> Node<T>::isVisited;

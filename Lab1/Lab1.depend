@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1538526097 source:d:\course2\lab1\main.cpp
+	<classes.h>
+	<clocale>
+
+1538526164 d:\course2\lab1\\classes.h
+	<iostream>
+	<vector>
+	<string>
+	<queue>
+
