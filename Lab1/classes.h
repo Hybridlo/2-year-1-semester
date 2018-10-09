@@ -18,10 +18,12 @@ private:
     vector<Book*> inBook;
     Node<Book> *father;
 public:
-    void newBook(string charBuffer, Book *from, Node<Book> *fath)
+    Character *newBook(string charBuffer, Book *from, Node<Book> *fath)
     {
         name = charBuffer;
+        father = fath;
         addBook(from);
+        return this;
     }
     void addBook(Book *from)
     {
@@ -53,10 +55,10 @@ private:
     string annotation;
     string charName;
     vector<Character*> characters;
-    queue<Character*> allChars;
     Node<Book> *tiedTo;
 public:
-    void *addChar(string charName)
+    static queue<Character*> allChars;
+    void addChar(string charName)
     {
         Character *queueBuffer;
 
@@ -72,14 +74,15 @@ public:
                 queueBuffer->addBook(this);
                 tiedTo = queueBuffer->getFather();
                 characters.push_back(queueBuffer);
-                return 0;
+                return;
             }
 
         }
 
         Character *newChar = new Character;
-        newChar->newBook(charName, this, tiedTo);
+        queueBuffer = newChar->newBook(charName, this, tiedTo);
         characters.push_back(queueBuffer);
+        allChars.push(queueBuffer);
     }
     Node<Book> *addBook(Node<Book> *connection)
     {
@@ -150,7 +153,14 @@ public:
         if (day >= comDay)
             return false;
     }
+    friend ostream& operator<<(ostream& os, const Book &out)
+    {
+        os << " " << out.name << " ";
+        return os;
+    }
 };
+
+queue<Character*> Book::allChars;
 
 template <typename T>
 class Node
@@ -160,11 +170,10 @@ private:
     int thisNode;
 public:
     static int allNodes;
-    static vector<int> edgeList[2];
-    static vector<bool> isVisited;
     Node()
     {
         thisNode = allNodes;
+        allNodes++;
     }
     void filling(T filled)
     {
@@ -184,32 +193,13 @@ public:
                     content[j] = buffer;
                 }
     }
-    static void dfs(int pos)
+    friend ostream& operator<<(ostream& os, const Node<T> &out)
     {
-        for (int i = 0; i < edgeList[0].size(); i++)
-        {
-
-            if (pos == edgeList[0][i] && !isVisited[edgeList[1][i]])
-            {
-                cout << edgeList[0][i] << "-" << edgeList[1][i];
-                isVisited[edgeList[0][i]] = true;
-                dfs(edgeList[1][i]);
-            }
-        }
-    }
-    static void spanningTree(int pos)
-    {
-        for (int i = 0; i < allNodes; i++)
-            isVisited.push_back(false);
-
-        Node::dfs(pos);
-
-        isVisited.clear();
+        os << out.content[0] << "\n";
+        for (int i = 1; i < out.content.size(); i++)
+            os << "   " << out.content[i] << "\n";
+        return os;
     }
 };
 template <typename T>
 int Node<T>::allNodes;
-template <typename T>
-vector<int> Node<T>::edgeList[2];
-template <typename T>
-vector<bool> Node<T>::isVisited;
