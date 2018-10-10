@@ -1,5 +1,4 @@
 #include <classes.h>
-#include <clocale>
 
 using namespace std;
 
@@ -45,9 +44,8 @@ int main()
     vector<int> edgeList[2];
     vector<bool> isVisited;
     string input;
-    setlocale(LC_ALL, "Russian");
 
-    cout << "Введите \"new\" для создания узла, \"out\" для вывода вершин и связей, \"graph\" для вывода узлов остовного дерева, \"exit\" для выхода из программы\n";
+    cout << "Enter \"new\" to create a node, \"out\" to output all nodes and edges, \"graph\" to output a spanning tree, \"exit\" to finish the program\n";
     cin >> input;
 
     int i = 0;
@@ -63,7 +61,7 @@ int main()
         if (input == "out")
             for (int k = 0; k < *pAllNodes; k++)
             {
-                cout << "#" << k << " " << vertices[k] << "Связан с:";
+                cout << "#" << k << " " << vertices[k] << "Connected to:";
                 for (int j = 0; j < *pAllNodes-1; j++)
                 if (edgeList[0][j] == k)
                     cout << " #" << edgeList[1][j];
@@ -80,7 +78,7 @@ int main()
             Node<Book> newNode; //change
             vertices.push_back(newNode);
             Book i0; //change
-            cout << "Введите информацию вершины: \n";
+            cout << "Enter node content: \n";
             /*cin >> i0;*/                                  //here if anything except Book
             Node<Book> *temp = i0.addBook(&vertices[i]);    //for Book
             if (temp != &vertices[i])                       //for Book
@@ -88,7 +86,7 @@ int main()
                 vertices.pop_back();                        //for Book
                 i--;                                        //for Book
                 *pAllNodes = *pAllNodes - 1;                //for Book
-                cout << "Новая книга серии\n";              //for Book
+                cout << "New book of the series\n";              //for Book
             }                                               //for Book
             vertices[i].filling(i0);
 
@@ -97,11 +95,11 @@ int main()
             if (i > 0)
             while (!exit)
             {
-                cout << "Связать вершину?(y/n)\n";
+                cout << "Connect node?(y/n)\n";
                 cin >> input;
                 if (input == "y")
                 {
-                    cout << "С какой вершиной связать? 0 - " << i-1 << "\n";
+                    cout << "Connect with which node? 0 - " << i-1 << "\n";
                     cin >> connect;
                     if (connect < i)
                     {
@@ -109,7 +107,7 @@ int main()
                         for (int j = 0; j < edgeList[0].size(); j++)
                             if ((edgeList[0][j] == connect && edgeList[1][j] == i) || (edgeList[0][j] == i && edgeList[1][j] == connect))
                             {
-                                cout << "Вершины уже связаны\n";
+                                cout << "Nodes are connected\n";
                                 check = true;
                                 break;
                             }
@@ -123,7 +121,7 @@ int main()
                     }
                     else
 
-                    cout << "Некорректная вершина, пробуем сначала\n";
+                    cout << "Node does not exist\n";
                 }
                 else
 
@@ -131,17 +129,17 @@ int main()
                     exit = true;
                 else
 
-                cout << "Некорректный ввод, начинаем сначала\n";
+                cout << "Incorrect input, try again\n";
             }
             i++;
         }
         else
         {
-            cout << "Некорректный ввод, попробуйте ещё раз";
-            return 0;
+            cout << "Incorrect input, try again";
+            continue;
         }
 
-        cout << "Введите \"new\" для создания узла, \"out\" для вывода вершин и связей, \"graph\" для вывода узлов остовного дерева, \"exit\" для выхода из программы\n";
+        cout << "Enter \"new\" to create a node, \"out\" to output all nodes and edges, \"graph\" to output a spanning tree, \"exit\" to finish the program\n";
         cin >> input;
     }
 }

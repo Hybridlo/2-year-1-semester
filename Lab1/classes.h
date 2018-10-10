@@ -87,21 +87,21 @@ public:
     Node<Book> *addBook(Node<Book> *connection)
     {
         tiedTo = connection;
-        cout << "Введите название книги: ";
+        cout << "Enter name of book: ";
         cin >> name;
-        cout << "Автора: ";
+        cout << "Author: ";
         cin >> author;
-        cout << "День издания: ";
+        cout << "Release date: ";
         cin >> day;
-        cout << "Месяц: ";
+        cout << "Month: ";
         cin >> month;
-        cout << "Год: ";
+        cout << "Year: ";
         cin >> year;
-        cout << "Кол-во страниц в книге: ";
+        cout << "Amount of pages: ";
         cin >> pages;
-        cout << "Короткая аннотация: ";
+        cout << "Short annotation: ";
         cin >> annotation;
-        cout << "Вводите персонажей, когда закончите, введите \"0\":\n";
+        cout << "Enter characters, when done enter` \"0\":\n";
         cin >> charName;
 
         while (charName !="0")
