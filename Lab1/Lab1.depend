@@ -1,11 +1,28 @@
 # depslib dependency file v1.0
-1539131051 source:d:\course2\lab1\main.cpp
-	<classes.h>
-	<clocale>
+1540498203 source:d:\course2\lab1\main.cpp
+	"Books and chars.h"
+	"Node.h"
 
-1539130534 d:\course2\lab1\\classes.h
+1539620486 d:\course2\lab1\\classes.h
 	<iostream>
 	<vector>
 	<string>
 	<queue>
+
+1540499077 d:\course2\lab1\classes.h
+	<iostream>
+	<vector>
+	<string>
+	<queue>
+	<typeinfo>
+
+1540933578 d:\course2\lab1\books and chars.h
+	<iostream>
+	<vector>
+	<string>
+
+1540933578 d:\course2\lab1\node.h
+	<iostream>
+	<vector>
+	<string>
 

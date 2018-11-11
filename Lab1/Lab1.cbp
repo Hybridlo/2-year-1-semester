@@ -33,7 +33,8 @@
 			<Add option="-fexceptions" />
 			<Add directory="D:/Course2/Lab1/" />
 		</Compiler>
-		<Unit filename="classes.h" />
+		<Unit filename="Books and chars.h" />
+		<Unit filename="Node.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
