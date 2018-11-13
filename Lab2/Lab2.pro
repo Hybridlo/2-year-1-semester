@@ -26,13 +26,19 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        widget.cpp
+        widget.cpp \
+    fileinfowindow.cpp \
+    searchbymap.cpp
 
 HEADERS += \
-        widget.h
+        widget.h \
+    fileinfowindow.h \
+    searchbymap.h
 
 FORMS += \
-    widget.ui
+    widget.ui \
+    fileinfowindow.ui \
+    searchbymap.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

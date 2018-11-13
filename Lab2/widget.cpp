@@ -1,19 +1,10 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include <QFile>
-#include <QDirIterator>
-#include <QString>
-#include <QDebug>
-#include <QDir>
-#include <QInputDialog>
-#include <QUrl>
-#include <QDesktopServices>
-#include <QDateTime>
-#include <QCryptographicHash>
-#include <QTextCodec>
+#include "fileinfowindow.h"
 
 void initDrives(Ui::Widget *ui)
 {
+    ui->listWidget->clear();
     QDirIterator it(QDir::currentPath() + "/dirdata", QStringList() << "*.txt", QDir::Files);
     while (it.hasNext())
     {
@@ -31,12 +22,12 @@ int getBackInDir(QTextStream *in, Ui::Widget *ui, QString exactFile)
     bool inPrevpath = false;
     if (prevpath.size() == 0)
         inPrevpath = true;
-    QString line;
-    int i = 0, linenum = 0;
+    QString line = in->readLine();
+    int i = 0, linenum = 1; //1 for skipped hard drive sector name
     while (!inPrevpath)
     {
         line = in->readLine();
-        line.remove(line.indexOf("\"") - 1, line.size());
+        line.remove(line.indexOf("\"") - 1, line.size()); //remove metadata
         linenum++;
         QString nextdir = prevpath.mid(0, prevpath.indexOf("/")); //take 1 directory step
         i++;
@@ -53,7 +44,12 @@ int getBackInDir(QTextStream *in, Ui::Widget *ui, QString exactFile)
         if (prevpath.size() == 0)
             inPrevpath = true;
     }
-    return linenum + 1; //+1 for skipped drive name
+    return linenum;
+}
+
+void addMetadata(QTextStream *out, QString key, QString value)
+{
+    *out << " \"" << key << "\" \"" << value << "\"";
 }
 
 Widget::Widget(QWidget *parent) :
@@ -64,6 +60,7 @@ Widget::Widget(QWidget *parent) :
     initDrives(ui);
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_3->setEnabled(false);
+    ui->pushButton_4->setEnabled(false);
 }
 
 Widget::~Widget()
@@ -83,7 +80,7 @@ void Widget::on_pushButton_clicked()
         while (text == "")
         {
            bool ok;
-           text = QInputDialog::getText(0, "Drive",
+           text = QInputDialog::getText(this, "Drive",
                                            "Enter " + drives.at(i).filePath() + " name:", QLineEdit::Normal,
                                            "", &ok); //assign name for a drive
            if (!ok)
@@ -117,15 +114,18 @@ void Widget::on_pushButton_clicked()
             while(!hashing.atEnd())
               crypto.addData(hashing.read(8192));
             QByteArray hash = crypto.result();
-            qDebug() << hash.toHex();
-            out << newdir << " \"" << info.created().toString("dd.MM.yyyy HH:mm:ss")
-                << "\" \"" << info.lastModified().toString("dd.MM.yyyy HH:mm:ss") << "\"";
+            out << newdir;
+            addMetadata(&out, "Created", info.created().toString("dd.MM.yyyy HH:mm:ss"));
+            addMetadata(&out, "Last modified", info.lastModified().toString("dd.MM.yyyy HH:mm:ss"));
+
             if (it.fileName().indexOf('.') != -1) //directories have same hash
-                out << " \"" << hash.toHex() << "\"";
-            out << " \"\"" << "\n"; //adding last "" for user notes
+                addMetadata(&out, "SHA-1 Hash", hash.toHex());
+            addMetadata(&out, "User notes", "");
+            out << '\n';
         }
         fout.close();
     }
+    initDrives(ui);
 }
 
 int dirDepth = 0;
@@ -145,8 +145,7 @@ void Widget::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
         dirDepth--;
         if (dirDepth == 0)
         {
-           ui->listWidget->clear();  //show offline drives if got out of some drive
-           initDrives(ui);
+           initDrives(ui);  //show offline drives if got out of some drive
            ui->pushButton->setEnabled(true);
            ui->pushButton_2->setEnabled(false);
            return;
@@ -179,7 +178,6 @@ void Widget::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
     QFile fin(currfile);
     fin.open(QIODevice::ReadOnly);
     QTextStream in(&fin);
-    in.readLine();  //don't read drive's name
 
     getBackInDir(&in, ui, "");  //getting back into working directory
 
@@ -236,11 +234,10 @@ void Widget::on_pushButton_3_clicked()
     QFile fin(currfile);
     fin.open(QIODevice::ReadOnly);
     QTextStream in(&fin);
-    in.readLine();  //don't read drive's name
 
     int linenum = getBackInDir(&in, ui, ui->listWidget->currentItem()->text());  //find file position in txt
 
-    in.seek(0);
+    in.seek(0); //get back to start of the txt
 
     QFile fout("dirdata/temp.txt");
     fout.open(QIODevice::WriteOnly);
@@ -250,24 +247,25 @@ void Widget::on_pushButton_3_clicked()
     while (!in.atEnd())
     {
         QString line = in.readLine();
-        QStringList temp = line.split(' ');
         i++;
         if (i == linenum)
         {
-            QString notes = temp.at(temp.size() - 1); //get old user notes
-            notes.remove(0, 1);
-            notes.chop(1); //remove brackets
+            QMap<QString, QString> temp = getMetadata(line);
+            QString notes = temp.value("User notes"); //get old user notes
             QString text = "";
             while (text == "") //get new notes
             {
-               text = QInputDialog::getText(0, "Drive",
+               text = QInputDialog::getText(this, "Drive",
                                                "Enter " + ui->listWidget->currentItem()->text() + " notes:",
                                                QLineEdit::Normal, notes); //set notes
             }
-            text = '\"' + text + '\"';
-            temp.pop_back();
-            temp << text; //set them back in list
-            line = temp.join(' ');
+            temp["User notes"] = text;
+            line = line.mid(0, line.indexOf('"') - 1); //remove old metadata
+            QMapIterator<QString, QString> i(temp);
+            while (i.hasNext()) {
+                i.next();
+                line = line + " \"" + i.key() + "\" \"" + i.value() + "\""; //add new metadata
+            }
         }
         out << line << '\n';
     }
@@ -279,8 +277,37 @@ void Widget::on_pushButton_3_clicked()
 
 void Widget::on_listWidget_itemClicked(QListWidgetItem *item)
 {
-    if (ui->listWidget->item(0)->text() == ".." && (item->text() != ".."))
-        ui->pushButton_3->setEnabled(true);
-    else
-        ui->pushButton_3->setEnabled(false);
+     if (ui->listWidget->item(0)->text() == ".." && (item->text() != ".."))
+     {
+         ui->pushButton_3->setEnabled(true);
+         ui->pushButton_4->setEnabled(true);
+     }
+     else
+     {
+         ui->pushButton_3->setEnabled(false);
+         ui->pushButton_4->setEnabled(false);
+     }
+}
+
+void Widget::on_pushButton_4_clicked()
+{
+    QFile fin(currfile);
+    fin.open(QIODevice::ReadOnly);
+    QTextStream in(&fin);
+
+    getBackInDir(&in, ui, ""); //get back in directory where highlighted file is
+    QString line, templine;
+    while (templine != (QString(' ').repeated(templine.lastIndexOf(" ") + 1) + ui->listWidget->currentItem()->text()))
+    {   //looking for that directory
+        line = in.readLine();
+        templine = line.mid(0, line.indexOf("\"") - 1); //remove metadata
+    }   //at the end line = highlighted item with it's metadata
+    QMap<QString, QString> metadata = getMetadata(line);  //parse metadata from line
+    FileInfoWindow fileInfoWindow(this, metadata);
+    fileInfoWindow.exec();
+}
+
+void Widget::on_pushButton_5_clicked()
+{
+
 }

@@ -1,8 +1,18 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
+#include "fileinfowindow.h"
 #include <QWidget>
 #include <QListWidgetItem>
+#include <QString>
+#include <QDebug> //remove later
+#include <QDir>
+#include <QInputDialog>
+#include <QUrl>
+#include <QDesktopServices>
+#include <QDateTime>
+#include <QCryptographicHash>
+#include <QTextCodec>
 
 namespace Ui {
 class Widget;
@@ -26,6 +36,10 @@ private slots:
     void on_pushButton_3_clicked();
 
     void on_listWidget_itemClicked(QListWidgetItem *item);
+
+    void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
 
 private:
     Ui::Widget *ui;
