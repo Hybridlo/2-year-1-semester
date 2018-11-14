@@ -20,7 +20,7 @@ class SearchByMap : public QDialog
     Q_OBJECT
 
 public:
-    explicit SearchByMap(QWidget *parent = nullptr, QMap<QString, QString> metadata = QMap<QString, QString>());
+    explicit SearchByMap(QWidget *parent = nullptr, QMap<QString, QString> metadata = QMap<QString, QString>(), bool mode = false);
     ~SearchByMap();
 
 private slots:

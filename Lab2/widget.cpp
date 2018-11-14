@@ -117,6 +117,7 @@ void Widget::on_pushButton_clicked()
             out << newdir;
             addMetadata(&out, "Created", info.created().toString("dd.MM.yyyy HH:mm:ss"));
             addMetadata(&out, "Last modified", info.lastModified().toString("dd.MM.yyyy HH:mm:ss"));
+            addMetadata(&out, "Size", QString::number(info.size()));
 
             if (it.fileName().indexOf('.') != -1) //directories have same hash
                 addMetadata(&out, "SHA-1 Hash", hash.toHex());
@@ -309,5 +310,6 @@ void Widget::on_pushButton_4_clicked()
 
 void Widget::on_pushButton_5_clicked()
 {
-
+    UserSearch search(this);
+    search.exec();
 }

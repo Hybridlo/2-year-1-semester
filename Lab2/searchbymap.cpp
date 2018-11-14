@@ -16,7 +16,7 @@ QMap<QString, QString> getMetadata(QString line)
     return result;
 }
 
-SearchByMap::SearchByMap(QWidget *parent, QMap<QString, QString> metadata) :
+SearchByMap::SearchByMap(QWidget *parent, QMap<QString, QString> metadata, bool mode) : //if mode = true the search is for 1 key-value
     QDialog(parent),
     ui(new Ui::SearchByMap)
 {
@@ -40,14 +40,20 @@ SearchByMap::SearchByMap(QWidget *parent, QMap<QString, QString> metadata) :
         while (!in.atEnd())
         {
             QString line = in.readLine();
-            QMap<QString, QString> compare = getMetadata(line); //get metadata of a file
+            QMap<QString, QString> compare;
+            if (!metadata.contains("Name"))
+                compare = getMetadata(line); //get metadata of a file
 
             int j = 0;
-            while (line[j] == ' ') //count depth of the line
+            while (line[0] == ' ') //count depth of the line
+            {
                 j++;
+                line.remove(0, 1);
+            }
             line = line.remove(line.indexOf("\"") - 1, line.size()); //chop off metadata
-            while (line[0] == ' ')
-                line.remove(0, 1);  //remove depth space bars
+
+            if (metadata.contains("Name"))
+                    compare["Name"] = line.mid(0, line.indexOf(".")); //get file name without suffix
 
             while (depth >= j)
             {
@@ -62,10 +68,24 @@ SearchByMap::SearchByMap(QWidget *parent, QMap<QString, QString> metadata) :
             while (i.hasNext()) //compare QMaps
             {
                 i.next();
-                if (!metadata.contains(i.key()) || metadata.value(i.key()) != i.value())
+                if (mode)
                 {
-                    equal = false;
-                    break; //data did not match, go to the next line
+                    if (metadata.contains(i.key()) && metadata.value(i.key()) != i.value())
+                    {
+                        equal = false;
+                        qDebug() << i.key() << ' ' << i.value();
+                        break; //data did not match, go to the next line
+                    }
+                }
+                else
+                {
+                    if (i.key() == "User notes") //skip user notes
+                        continue;
+                    if (!metadata.contains(i.key()) || metadata.value(i.key()) != i.value())
+                    {
+                        equal = false;
+                        break; //data did not match, go to the next line
+                    }
                 }
             }
             if (equal)

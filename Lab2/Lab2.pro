@@ -28,17 +28,20 @@ SOURCES += \
         main.cpp \
         widget.cpp \
     fileinfowindow.cpp \
-    searchbymap.cpp
+    searchbymap.cpp \
+    usersearch.cpp
 
 HEADERS += \
         widget.h \
     fileinfowindow.h \
-    searchbymap.h
+    searchbymap.h \
+    usersearch.h
 
 FORMS += \
     widget.ui \
     fileinfowindow.ui \
-    searchbymap.ui
+    searchbymap.ui \
+    usersearch.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

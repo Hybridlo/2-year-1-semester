@@ -2,8 +2,8 @@
 #define FILEINFOWINDOW_H
 
 #include <QDialog>
-#include "searchbymap.h"
 #include <QSignalMapper>
+#include "usersearch.h"
 
 namespace Ui {
 class FileInfoWindow;

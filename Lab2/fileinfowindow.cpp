@@ -25,7 +25,27 @@ FileInfoWindow::FileInfoWindow(QWidget *parent, QMap<QString, QString> meta) :
         item = new QTableWidgetItem(i.key());
         item->setFlags(Qt::NoItemFlags);
         ui->tableWidget->setVerticalHeaderItem(j, item); //name of the row is the key
-
+        int size = i.value().toInt();
+        int level = 0;
+        if (item->text() == "Size")
+        {
+            QString stringLevel;
+            while (size > 1024)
+            {
+                size = size / 1024;
+                level++;
+            }
+            if (level == 0)
+                stringLevel = " byte";
+            if (level == 1)
+                stringLevel = " KB";
+            if (level == 2)
+                stringLevel = " MB";
+            if (level == 3)
+                stringLevel = " GB";
+            item = new QTableWidgetItem(QString::number(size) + stringLevel);
+        }
+        else
         item = new QTableWidgetItem(i.value()); //item with value
         item->setFlags(Qt::NoItemFlags);
         ui->tableWidget->setItem(j,0, item); //set that item in table
