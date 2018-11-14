@@ -84,8 +84,10 @@ void Widget::on_pushButton_clicked()
                                            "Enter " + drives.at(i).filePath() + " name:", QLineEdit::Normal,
                                            "", &ok); //assign name for a drive
            if (!ok)
-               return;
+               break;
         }
+        if (text == "")
+            continue;
         text = "dirdata\\" + text + ".txt";  //to create a txt file with drive content
 
         if (!QDir(QDir::currentPath()).exists("dirdata")) //create a dirdata directory if doesn't exist
@@ -121,6 +123,8 @@ void Widget::on_pushButton_clicked()
 
             if (it.fileName().indexOf('.') != -1) //directories have same hash
                 addMetadata(&out, "SHA-1 Hash", hash.toHex());
+            else
+                addMetadata(&out, "SHA-1 Hash", "");
             addMetadata(&out, "User notes", "");
             out << '\n';
         }
@@ -232,6 +236,8 @@ void Widget::on_pushButton_2_clicked()
 
 void Widget::on_pushButton_3_clicked()
 {
+    if (ui->listWidget->currentItem() == nullptr)
+        return;
     QFile fin(currfile);
     fin.open(QIODevice::ReadOnly);
     QTextStream in(&fin);
@@ -292,6 +298,8 @@ void Widget::on_listWidget_itemClicked(QListWidgetItem *item)
 
 void Widget::on_pushButton_4_clicked()
 {
+    if (ui->listWidget->currentItem() == nullptr)
+        return;
     QFile fin(currfile);
     fin.open(QIODevice::ReadOnly);
     QTextStream in(&fin);

@@ -79,7 +79,7 @@ SearchByMap::SearchByMap(QWidget *parent, QMap<QString, QString> metadata, bool 
                 }
                 else
                 {
-                    if (i.key() == "User notes") //skip user notes
+                    if (i.key() == "User notes" || i.key() == "Created") //skip user notes and cretion date
                         continue;
                     if (!metadata.contains(i.key()) || metadata.value(i.key()) != i.value())
                     {
