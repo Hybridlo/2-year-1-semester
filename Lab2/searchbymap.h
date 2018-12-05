@@ -7,7 +7,6 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug> //remove later
 
 namespace Ui {
 class SearchByMap;

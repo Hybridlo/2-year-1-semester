@@ -99,9 +99,12 @@ void Widget::on_pushButton_clicked()
         out << drives.at(i).filePath() << '\n';
 
         QDirIterator it(drives.at(i).filePath(), QDir::AllEntries | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-        while (it.hasNext()) {  //scan drive
+        while (it.hasNext()) //scan drive
+        {
             it.next();
-            QString dir = it.filePath();
+            QString dir = it.filePath().toUtf8();
+            ui->listWidget->clear();
+            ui->listWidget->addItem(dir);
             QFileInfo info(dir);
             QString newdir = "";
             for (int j = 0; j < dir.size(); j++)
@@ -114,7 +117,7 @@ void Widget::on_pushButton_clicked()
             QFile hashing(it.filePath());
             hashing.open(QFile::ReadOnly);
             while(!hashing.atEnd())
-              crypto.addData(hashing.read(8192));
+              crypto.addData(hashing.read(67108864)); //64 MB
             QByteArray hash = crypto.result();
             out << newdir;
             addMetadata(&out, "Created", info.created().toString("dd.MM.yyyy HH:mm:ss"));
@@ -127,7 +130,10 @@ void Widget::on_pushButton_clicked()
                 addMetadata(&out, "SHA-1 Hash", "");
             addMetadata(&out, "User notes", "");
             out << '\n';
+            QThread::msleep(1);
+            qApp->processEvents();
         }
+        ui->listWidget->clear();
         fout.close();
     }
     initDrives(ui);
@@ -312,6 +318,8 @@ void Widget::on_pushButton_4_clicked()
         templine = line.mid(0, line.indexOf("\"") - 1); //remove metadata
     }   //at the end line = highlighted item with it's metadata
     QMap<QString, QString> metadata = getMetadata(line);  //parse metadata from line
+    templine.remove(0, templine.lastIndexOf(" ") + 1);
+    metadata.insert("Name", templine);
     FileInfoWindow fileInfoWindow(this, metadata);
     fileInfoWindow.exec();
 }

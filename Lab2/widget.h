@@ -13,6 +13,7 @@
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QTextCodec>
+#include <QThread>
 
 namespace Ui {
 class Widget;

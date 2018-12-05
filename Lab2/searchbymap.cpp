@@ -53,7 +53,9 @@ SearchByMap::SearchByMap(QWidget *parent, QMap<QString, QString> metadata, bool 
             line = line.remove(line.indexOf("\"") - 1, line.size()); //chop off metadata
 
             if (metadata.contains("Name"))
-                    compare["Name"] = line.mid(0, line.indexOf(".")); //get file name without suffix
+            {
+                compare["Name"] = line.mid(0, line.indexOf(".")); //get file name without suffix
+            }
 
             while (depth >= j)
             {
@@ -73,13 +75,13 @@ SearchByMap::SearchByMap(QWidget *parent, QMap<QString, QString> metadata, bool 
                     if (metadata.contains(i.key()) && metadata.value(i.key()) != i.value())
                     {
                         equal = false;
-                        qDebug() << i.key() << ' ' << i.value();
                         break; //data did not match, go to the next line
                     }
                 }
                 else
                 {
-                    if (i.key() == "User notes" || i.key() == "Created") //skip user notes and cretion date
+                    if (i.key() == "User notes" || i.key() == "Created" || i.key() == "Last modified" || //skip user notes, cretion and modify date
+                            (compare.value("SHA-1 Hash") != "" && i.key() == "Name")) //for non-empty directories and files skip name
                         continue;
                     if (!metadata.contains(i.key()) || metadata.value(i.key()) != i.value())
                     {

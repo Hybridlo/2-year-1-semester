@@ -36,7 +36,6 @@ void UserSearch::on_pushButton_clicked()
         return;
     QMap<QString, QString> searchBy;
     searchBy[ui->comboBox->currentText()] = ui->lineEdit->text();
-    qDebug() << ui->comboBox->currentText();
     SearchByMap search(this, searchBy, true);
     search.exec();
 }
