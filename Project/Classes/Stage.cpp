@@ -279,29 +279,36 @@ bool StageScene::isColliding(int dir, Sprite *moving)
 
 bool StageScene::isBulletColliding(int dir, cocos2d::Sprite *moving, int bulletNumber)
 {
-	CCLOG("Hey");
 	int xpos = moving->getPosition().x - xplay;
 	int ypos = moving->getPosition().y - yplay;
-	if (dir == 0 && (collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16 + 1)] == bulletNumber &&
-		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16 + 1)] == bulletNumber))
+	if (dir == 0 && ((collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16 + 1)] == bulletNumber &&
+		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16 + 1)] == bulletNumber) ||
+		(collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16 + 1)] == bulletNumber - 100 &&
+		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16 + 1)] == bulletNumber - 100)))
 		return false;
 	if (dir == 0 && (collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16 + 1)] != 0 ||
 		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16 + 1)] != 0 ))
 		return true;
-	if (dir == 1 && (collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16)] == bulletNumber &&
-		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16)] == bulletNumber))
+	if (dir == 1 && ((collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16)] == bulletNumber &&
+		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16)] == bulletNumber) ||
+		(collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16)] == bulletNumber - 100 &&
+		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16)] == bulletNumber - 100)))
 		return false;
 	if (dir == 1 && (collision[(int)((xpos - 28) / 16) + 1][(int)(ypos / 16)] != 0 ||
 		collision[(int)((xpos - 28) / 16) + 2][(int)(ypos / 16)] != 0))
 		return true;
-	if (dir == 2 && (collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 1] == bulletNumber &&
-		collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 2] == bulletNumber))
+	if (dir == 2 && ((collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 1] == bulletNumber &&
+		collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 2] == bulletNumber) ||
+		(collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 1] == bulletNumber - 100 &&
+		collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 2] == bulletNumber - 100)))
 		return false;
 	if (dir == 2 && (collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 1] != 0 ||
 		collision[(int)(xpos / 16)][(int)((ypos - 28) / 16) + 2] != 0))
 		return true;
-	if (dir == 3 && (collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 1] == bulletNumber &&
-		collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 2] == bulletNumber))
+	if (dir == 3 && ((collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 1] == bulletNumber &&
+		collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 2] == bulletNumber) ||
+		(collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 1] == bulletNumber - 100 &&
+			collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 2] == bulletNumber - 100)))
 		return false;
 	if (dir == 3 && (collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 1] != 0 ||
 		collision[(int)(xpos / 16 + 1)][(int)((ypos - 28) / 16) + 2] != 0))
@@ -533,20 +540,6 @@ void StageScene::shoot(Tank *tank, float delta)
 	Bullet *bullet = new Bullet;
 	bullet->owner = tank;
 	bullet->way = tank->way;
-	/*Bullet *bullet2 = new Bullet;
-	Tank *tank2 = new Tank;
-	tank2->enemyNumber = 5;
-	tank2->setSprite(Sprite::create("player1u1up1.png"));
-	this->addChild(tank2->getSprite());
-	tank2->getSprite()->setPosition(sprite->getPosition().x + 28, yplay + 768);
-	bullet2->owner = tank2;
-	bullet2->way = 1;
-	bullet2->setSprite(Sprite::create("bulletDown.png"));
-	bullet2->getSprite()->setPosition(sprite->getPosition().x + 28, yplay + 768);
-	bullet2->getSprite()->setAnchorPoint(Vec2(0.0, 0.0));
-	bullet2->getSprite()->runAction(RepeatForever::create(MoveBy::create(delta, Vec2(0, -8 * 1))));
-	bullets.push_back(bullet2);
-	this->addChild(bullet2->getSprite());*/ //additional bullet from the top
 	MoveBy *action;
 	if (bullet->way == 0)
 	{
@@ -557,13 +550,13 @@ void StageScene::shoot(Tank *tank, float delta)
 	else if (bullet->way == 1)
 	{
 		bullet->setSprite(Sprite::create("bulletDown.png"));
-		bullet->getSprite()->setPosition(sprite->getPosition().x + 28, sprite->getPosition().y - 8);
+		bullet->getSprite()->setPosition(sprite->getPosition().x + 28, sprite->getPosition().y + 8);
 		action = MoveBy::create(delta, Vec2(0, -8 * tank->bulletSpeed));
 	}
 	else if (bullet->way == 2)
 	{
 		bullet->setSprite(Sprite::create("bulletLeft.png"));
-		bullet->getSprite()->setPosition(sprite->getPosition().x - 8, sprite->getPosition().y + 28);
+		bullet->getSprite()->setPosition(sprite->getPosition().x + 8, sprite->getPosition().y + 28);
 		action = MoveBy::create(delta, Vec2(-8 * tank->bulletSpeed, 0));
 	}
 	else if (bullet->way == 3)
@@ -884,25 +877,6 @@ bool StageScene::bulletDestroy(Bullet *bullet)
 			bullets[i]->owner->bullet = false;
 			itemExplode(bullets[i]->explosion, false, xpos * 16 + xplay, ypos * 16 + yplay);
 			bullets.erase(bullets.begin() + i);
-		}
-	}
-	if (bullet->way == 0)
-		y1 -= 16 + 16;
-	else if (bullet->way == 1)
-		y1 += 16 + 16;
-	else if (bullet->way == 2)
-		x1 += 16 + 16;
-	else if (bullet->way == 3)
-		x1 -= 16 + 16;
-	for (int i = -1; i < 5; i++)
-	{
-		for (int j = -1; j < 5; j++)
-		{
-			int xpos = (int)(((bullet->owner->getSprite()->getPosition().x - xplay) / 16) + i) * 16;
-			int ypos = (int)(((bullet->owner->getSprite()->getPosition().y - yplay) / 16) + j) * 16;
-			if (collision[(int)(xpos / 16)][(int)(ypos / 16)] == bullet->owner->enemyNumber &&
-				(xpos == x1 || xpos == x2 || xpos == x3 || xpos == x4) && (ypos == y1 || ypos == y2 || ypos == y3 || ypos == y4) && !wallDestroyed)
-				return false;
 		}
 	}
 	bullet->owner->bullet = false;
